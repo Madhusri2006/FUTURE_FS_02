@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Lead Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <h1>Client Lead Management</h1>
+        <button id="logoutBtn">Logout</button>
+    </header>
+
+    <main class="dashboard">
+
+        <section class="dashboard-header">
+            <div>
+                <h2>Lead Dashboard</h2>
+                <p>Manage and track your client leads</p>
+            </div>
+
+            <button id="addLeadBtn">+ Add Lead</button>
+        </section>
+
+        <section class="stats">
+
+            <div class="stat-card">
+                <h3>Total Leads</h3>
+                <p id="totalLeads">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>New</h3>
+                <p id="newLeads">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Contacted</h3>
+                <p id="contactedLeads">0</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>Converted</h3>
+                <p id="convertedLeads">0</p>
+            </div>
+
+        </section>
+
+        <section class="leads-section">
+
+            <div class="section-title">
+                <h2>All Leads</h2>
+
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    placeholder="Search leads..."
+                >
+            </div>
+
+            <div class="table-container">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="leadsTableBody">
+                        <!-- Leads will appear here -->
+                    </tbody>
+                </table>
+
+            </div>
+
+        </section>
+        <!-- Add Lead Form -->
+<section id="leadFormSection" class="lead-form-section" style="display: none;">
+
+    <h2>Add New Lead</h2>
+
+    <form id="leadForm">
+
+        <input
+            type="text"
+            id="leadName"
+            placeholder="Lead Name"
+            required
+        >
+
+        <input
+            type="email"
+            id="leadEmail"
+            placeholder="Email"
+            required
+        >
+
+        <input
+            type="text"
+            id="leadSource"
+            placeholder="Source (LinkedIn, Website, Referral...)"
+            required
+        >
+
+        <select id="leadStatus">
+            <option value="New">New</option>
+            <option value="Contacted">Contacted</option>
+            <option value="Converted">Converted</option>
+        </select>
+
+        <textarea
+            id="leadNotes"
+            placeholder="Notes / Follow-up details"
+        ></textarea>
+
+        <div class="form-buttons">
+            <button type="submit">Save Lead</button>
+            <button type="button" id="cancelLeadBtn">Cancel</button>
+        </div>
+
+    </form>
+
+</section>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
