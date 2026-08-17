@@ -1,3 +1,5 @@
+const API_URL = "http://localhost:5000/api/leads";
+
 const addLeadBtn = document.getElementById("addLeadBtn");
 const leadFormSection = document.getElementById("leadFormSection");
 const leadForm = document.getElementById("leadForm");
@@ -13,13 +15,19 @@ const convertedLeads = document.getElementById("convertedLeads");
 
 let leads = [];
 
+// Load leads from backend when page opens
+loadLeads();
+
+
 // Open Add Lead form
 addLeadBtn.addEventListener("click", () => {
     leadFormSection.style.display = "block";
+
     leadFormSection.scrollIntoView({
         behavior: "smooth"
     });
 });
+
 
 // Cancel form
 cancelLeadBtn.addEventListener("click", () => {
@@ -27,12 +35,12 @@ cancelLeadBtn.addEventListener("click", () => {
     leadFormSection.style.display = "none";
 });
 
+
 // Add new lead
-leadForm.addEventListener("submit", (event) => {
+leadForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const lead = {
-        id: Date.now(),
         name: document.getElementById("leadName").value,
         email: document.getElementById("leadEmail").value,
         source: document.getElementById("leadSource").value,
@@ -40,14 +48,64 @@ leadForm.addEventListener("submit", (event) => {
         notes: document.getElementById("leadNotes").value
     };
 
-    leads.push(lead);
+    try {
 
-    leadForm.reset();
-    leadFormSection.style.display = "none";
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(lead)
+        });
 
-    displayLeads();
-    updateStats();
+        if (!response.ok) {
+            throw new Error("Failed to add lead");
+        }
+
+        const newLead = await response.json();
+
+        leads.push(newLead);
+
+        leadForm.reset();
+        leadFormSection.style.display = "none";
+
+        displayLeads();
+        updateStats();
+
+        alert("Lead added successfully!");
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Unable to add lead. Please check the backend server.");
+
+    }
 });
+
+
+// Load leads from backend
+async function loadLeads() {
+
+    try {
+
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+            throw new Error("Failed to load leads");
+        }
+
+        leads = await response.json();
+
+        displayLeads();
+        updateStats();
+
+    } catch (error) {
+
+        console.error("Error loading leads:", error);
+
+    }
+}
+
 
 // Display leads
 function displayLeads(filteredLeads = leads) {
@@ -59,27 +117,41 @@ function displayLeads(filteredLeads = leads) {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-                <td>${lead.name}</td>
-                <td>${lead.email}</td>
-                <td>${lead.source}</td>
-                <td>
-                    <select onchange="changeStatus(${lead.id}, this.value)">
-                        <option value="New" ${lead.status === "New" ? 'selected' : ''}>New</option>
-                        <option value="Contacted" ${lead.status === "Contacted" ? 'selected' : ''}>Contacted</option>
-                        <option value="Converted" ${lead.status === "Converted" ? 'selected' : ''}>Converted</option>
-                    </select>
-                </td>
-                <td>${lead.notes || "-"}</td>
-                <td>
-                    <button onclick="deleteLead(${lead.id})">
-                        Delete
-                    </button>
-                </td>
-            `;
+            <td>${lead.name}</td>
+
+            <td>${lead.email}</td>
+
+            <td>${lead.source}</td>
+
+            <td>
+                <select onchange="changeStatus(${lead.id}, this.value)">
+                    <option value="New" ${lead.status === "New" ? "selected" : ""}>
+                        New
+                    </option>
+
+                    <option value="Contacted" ${lead.status === "Contacted" ? "selected" : ""}>
+                        Contacted
+                    </option>
+
+                    <option value="Converted" ${lead.status === "Converted" ? "selected" : ""}>
+                        Converted
+                    </option>
+                </select>
+            </td>
+
+            <td>${lead.notes || "-"}</td>
+
+            <td>
+                <button onclick="deleteLead(${lead.id})">
+                    Delete
+                </button>
+            </td>
+        `;
 
         leadsTableBody.appendChild(row);
     });
 }
+
 
 // Update dashboard statistics
 function updateStats() {
@@ -96,29 +168,84 @@ function updateStats() {
         leads.filter(lead => lead.status === "Converted").length;
 }
 
-// Change lead status from dropdown
-function changeStatus(id, newStatus) {
-    const lead = leads.find(l => l.id === id);
-    if (!lead) return;
 
-    lead.status = newStatus;
+// Change lead status
+async function changeStatus(id, newStatus) {
 
-    updateStats();
+    try {
+
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                status: newStatus
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update status");
+        }
+
+        const updatedLead = await response.json();
+
+        const leadIndex = leads.findIndex(
+            lead => lead.id === id
+        );
+
+        if (leadIndex !== -1) {
+            leads[leadIndex] = updatedLead;
+        }
+
+        displayLeads();
+        updateStats();
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Unable to update lead status.");
+
+    }
 }
+
 
 // Delete lead
-function deleteLead(id) {
+async function deleteLead(id) {
 
-    leads = leads.filter(lead => lead.id !== id);
+    try {
 
-    displayLeads();
-    updateStats();
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: "DELETE"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to delete lead");
+        }
+
+        leads = leads.filter(
+            lead => lead.id !== id
+        );
+
+        displayLeads();
+        updateStats();
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Unable to delete lead.");
+
+    }
 }
+
 
 // Search leads
 searchInput.addEventListener("input", () => {
 
-    const searchText = searchInput.value.toLowerCase();
+    const searchText =
+        searchInput.value.toLowerCase();
 
     const filteredLeads = leads.filter((lead) =>
         lead.name.toLowerCase().includes(searchText) ||

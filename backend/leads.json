@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1786981919217,
+    "name": "Ravi",
+    "email": "ravi@gmail.com",
+    "source": "Website",
+    "status": "New",
+    "notes": "Intrested"
+  },
+  {
+    "id": 1786982016736,
+    "name": "Rahul Kumar",
+    "email": "rahul@example.com",
+    "source": "Linkedin",
+    "status": "New",
+    "notes": "Intrested"
+  }
+]
