@@ -1,5 +1,4 @@
-const API_URL = "http://localhost:5000/api/leads";
-
+const API_URL = "https://future-fs-02-backend-oi1u.onrender.com/api/leads";
 const addLeadBtn = document.getElementById("addLeadBtn");
 const leadFormSection = document.getElementById("leadFormSection");
 const leadForm = document.getElementById("leadForm");
